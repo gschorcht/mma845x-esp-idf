@@ -63,7 +63,7 @@
 #define MMA845X_INT_ERROR_MASK          0x000f
 #define MMA845X_DRV_ERROR_MASK          0xfff0
 
-// Error codes for I2C and SPI interfaces ORed with MMA845X driver error codes
+// Error codes for I2C interfaces ORed with MMA845X driver error codes
 #define MMA845X_I2C_READ_FAILED         1
 #define MMA845X_I2C_WRITE_FAILED        2
 #define MMA845X_I2C_BUSY                3
@@ -105,8 +105,8 @@ extern "C"
  * Reset the sensor and switch to power down mode. All registers are reset to 
  * default values.
  *
- * @param   bus        I2C or SPI bus at which MMA845X sensor is connected
- * @param   addr       I2C addr of the MMA845X sensor, 0 for using SPI
+ * @param   bus        I2C at which MMA845X sensor is connected
+ * @param   addr       I2C addr of the MMA845X sensor
  * @return             pointer to sensor data structure, or NULL on error
  */
 mma845x_sensor_t* mma845x_init_sensor (uint8_t bus, uint8_t addr);

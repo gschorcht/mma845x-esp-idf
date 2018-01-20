@@ -285,24 +285,12 @@ void user_init(void)
 
     /** -- MANDATORY PART -- */
 
-    #ifdef SPI_USED
-
-    // init the sensor connnected to SPI
-    spi_bus_init (SPI_BUS, SPI_SCK_GPIO, SPI_MISO_GPIO, SPI_MOSI_GPIO);
-
-    // init the sensor connected to SPI_BUS with SPI_CS_GPIO as chip select.
-    sensor = mma845x_init_sensor (SPI_BUS, 0, SPI_CS_GPIO);
-    
-    #else
-
     // init all I2C bus interfaces at which MMA845X  sensors are connected
     i2c_init (I2C_BUS, I2C_SCL_PIN, I2C_SDA_PIN, I2C_FREQ);
     
     // init the sensor with slave address MMA845X_I2C_ADDRESS_2 connected to I2C_BUS.
     sensor = mma845x_init_sensor (I2C_BUS, MMA845X_I2C_ADDRESS_2);
 
-    #endif
-    
     if (sensor)
     {
         #ifdef INT_USED
