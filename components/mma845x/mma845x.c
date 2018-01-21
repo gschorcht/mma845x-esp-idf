@@ -205,12 +205,12 @@ struct mma845x_reg_f_setup
 
 struct mma845x_reg_trig_cfg
 {
-    uint8_t unused1    :1; // TRIG_CFG<1:0> unused
+    uint8_t unused1    :2; // TRIG_CFG<1:0> unused
     uint8_t Trig_FF_MT :1; // TRIG_CFG<2>   Free fall/motion interrupt trigger bit
     uint8_t Trig_PULSE :1; // TRIG_CFG<3>   Pulse interrupt trigger bit
     uint8_t Trig_LNDPRT:1; // TRIG_CFG<4>   Orientiration interrupt trigger bit
     uint8_t Trig_TRANS :1; // TRIG_CFG<5>   Transient interrupt trigger bit
-    uint8_t unused2    :1; // TRIG_CFG<7:6> unused
+    uint8_t unused2    :2; // TRIG_CFG<7:6> unused
 };
 
 struct mma845x_reg_sysmod
@@ -268,7 +268,7 @@ struct mma845x_reg_ff_mt_cfg
     uint8_t YEFE  :1; // FF_MT_CFG<4>   Event flag enable on X event
     uint8_t ZEFE  :1; // FF_MT_CFG<5>   Event flag enable on X event
     uint8_t OAE   :1; // FF_MT_CFG<6>   Motion detect / freefall detect selection
-    uint8_t ELE   :1; // PULSE_CFG<6>   Event latch enable
+    uint8_t ELE   :1; // FF_MT_CFG<6>   Event latch enable
 };
 
 struct mma845x_reg_ff_mt_ths
@@ -318,8 +318,8 @@ struct mma845x_reg_transient_cfg
 
 struct mma845x_reg_transient_ths
 {
-    uint8_t THS   :7; // FF_MT_CFG<6:0> transient event threshold
-    uint8_t DBCNTM:1; // FF_MT_CFG<7>   Debounce counter mode selection
+    uint8_t THS   :7; // TRANSIENT_CFG<6:0> transient event threshold
+    uint8_t DBCNTM:1; // TRANSIENT_CFG<7>   Debounce counter mode selection
 };
 
 
@@ -506,7 +506,7 @@ bool mma845x_set_fifo_mode (mma845x_sensor_t* dev,
     
     if (dev->id != mma8451q_id)
     {
-        error_dev ("FIFO is not supported by this sensor", __FUNCTION__, dev);
+        error_dev ("FIFO is not by this sensor", __FUNCTION__, dev);
         dev->error_code = MMA845X_NOT_SUPPORTED;
         return false;
     }
@@ -851,7 +851,7 @@ bool mma845x_set_int_event_config (mma845x_sensor_t* dev,
     ff_mt_cfg.OAE   = config->mode;
     ff_mt_cfg.ELE   = config->latch;
     ff_mt_ths.THS   = config->threshold;
-    ff_mt_ths.DBCNTM= config->debounce_cnt_decr;
+    ff_mt_ths.DBCNTM= config->debounce_cnt_mode;
 
     if (!mma845x_reg_write (dev, MMA845X_REG_FF_MT_CFG  , (uint8_t*)&ff_mt_cfg , 1) ||
         !mma845x_reg_write (dev, MMA845X_REG_FF_MT_THS  , (uint8_t*)&ff_mt_ths , 1) ||
@@ -881,10 +881,12 @@ bool mma845x_get_int_event_config (mma845x_sensor_t* dev,
 
     struct mma845x_reg_ff_mt_cfg ff_mt_cfg;
     struct mma845x_reg_ff_mt_ths ff_mt_ths;
+    struct mma845x_reg_ctrl3     ctrl3;
 
     if (!mma845x_reg_read (dev, MMA845X_REG_FF_MT_CFG  , (uint8_t*)&ff_mt_cfg , 1) ||
         !mma845x_reg_read (dev, MMA845X_REG_FF_MT_THS  , (uint8_t*)&ff_mt_ths , 1) ||
-        !mma845x_reg_read (dev, MMA845X_REG_FF_MT_COUNT, &config->debounce_cnt, 1))
+        !mma845x_reg_read (dev, MMA845X_REG_FF_MT_COUNT, &config->debounce_cnt, 1) ||
+        !mma845x_reg_read (dev, MMA845X_REG_CTRL3, (uint8_t*)&ctrl3, 1))
     {   
         error_dev ("Could not read event interrupt configuration from sensor", __FUNCTION__, dev);
         dev->error_code |= MMA845X_EVENT_CONFIG_FAILED;
@@ -899,7 +901,9 @@ bool mma845x_get_int_event_config (mma845x_sensor_t* dev,
     config->latch = ff_mt_cfg.ELE;
 
     config->threshold = ff_mt_ths.THS;
-    config->debounce_cnt_decr = ff_mt_ths.DBCNTM;
+    config->debounce_cnt_mode = ff_mt_ths.DBCNTM;
+    
+    config->sleep_active = ctrl3.WAKE_FF_MT;
 
     return true;
 }
@@ -949,7 +953,7 @@ bool mma845x_set_int_transient_config (mma845x_sensor_t* dev,
     transient_cfg.ELE     = config->latch;
     transient_cfg.HPF_BYP = config->hpf_bypassed;
     transient_ths.THS     = config->threshold;
-    transient_ths.DBCNTM  = config->debounce_cnt_decr;
+    transient_ths.DBCNTM  = config->debounce_cnt_mode;
 
     ctrl3.WAKE_TRANS = config->sleep_active;
     
@@ -997,7 +1001,7 @@ bool mma845x_get_int_transient_config (mma845x_sensor_t* dev,
     config->z_enabled = transient_cfg.ZTEFE;
 
     config->threshold = transient_ths.THS;
-    config->debounce_cnt_decr = transient_ths.DBCNTM;
+    config->debounce_cnt_mode = transient_ths.DBCNTM;
 
     config->latch = transient_cfg.ELE;
     config->hpf_bypassed = transient_cfg.HPF_BYP;
@@ -1177,7 +1181,7 @@ bool mma845x_set_orientation_config (mma845x_sensor_t* dev,
     struct mma845x_reg_pl_bf_zcomp pl_zcomp;
 
     pl_cfg.PL_EN   = config->enabled;
-    pl_cfg.DBCNTM  = config->debounce_cnt_decr;
+    pl_cfg.DBCNTM  = config->debounce_cnt_mode;
     pl_ths.PL_THS  = config->pl_threshold;
     pl_ths.HYS     = config->pl_hysteresis;
     pl_zcomp.BKFR  = config->bf_threshold;
@@ -1220,25 +1224,28 @@ bool mma845x_get_orientation_config (mma845x_sensor_t* dev,
     struct mma845x_reg_pl_cfg      pl_cfg;
     struct mma845x_reg_pl_ths      pl_ths;
     struct mma845x_reg_pl_bf_zcomp pl_zcomp;
+    struct mma845x_reg_ctrl3       ctrl3;
 
     if (!mma845x_reg_read (dev, MMA845X_REG_PL_CFG     , (uint8_t*)&pl_cfg    , 1) ||
         !mma845x_reg_read (dev, MMA845X_REG_PL_THS     , (uint8_t*)&pl_ths    , 1) ||
         !mma845x_reg_read (dev, MMA845X_REG_PL_BF_ZCOMP, (uint8_t*)&pl_zcomp  , 1) ||
-        !mma845x_reg_read (dev, MMA845X_REG_PL_COUNT   , &config->debounce_cnt, 1))
+        !mma845x_reg_read (dev, MMA845X_REG_PL_COUNT   , &config->debounce_cnt, 1) ||
+        !mma845x_reg_read (dev, MMA845X_REG_CTRL3, (uint8_t*)&ctrl3, 1))
     {
         error_dev ("Could not read orientation detection configuration from sensor", __FUNCTION__, dev);
         dev->error_code |= MMA845X_ORIENT_CONFIG_FAILED;
         return false;
     }
 
-    config->debounce_cnt_decr = pl_cfg.DBCNTM;
+    config->debounce_cnt_mode = pl_cfg.DBCNTM;
        
     config->enabled       = pl_cfg.PL_EN;
     config->pl_threshold  = pl_ths.PL_THS;
     config->pl_hysteresis = pl_ths.HYS;
     config->bf_threshold  = pl_zcomp.BKFR;
     config->z_lock        = pl_zcomp.ZLOCK;
-
+    config->sleep_active  = ctrl3.WAKE_LNDPRT;
+    
     return true;
 }
 
