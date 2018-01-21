@@ -372,7 +372,7 @@ event_config.x_enabled = true;          // x-axis is used for event detection
 event_config.y_enabled = true;          // y-axis is used for event detection
 event_config.z_enabled = false;         // z-axis is not used for event detection
 event_config.debounce_cnt = 5;          // 100 ms at ODR=50Hz in normal oversampling mode
-event_config.debounce_cnt_mode = false; // increment and decrement debounce counter
+event_config.debounce_cnt_clr = false;  // increment and decrement debounce counter
 event_config.latch = true;              // interrupt is latched until its source is read
 event_config.sleep_active = true;       // active in sleep mode
         
@@ -438,7 +438,7 @@ trans_config.x_enabled = true;          // x-axis is used for event detection
 trans_config.y_enabled = true;          // y-axis is used for event detection
 trans_config.z_enabled = false;         // z-axis is not used for event detection
 trans_config.debounce_cnt = 2;          // 40 ms at ODR=50Hz in normal oversampling mode
-trans_config.debounce_cnt_mode = true;  // increment and clear debounce counter
+trans_config.debounce_cnt_clr = true;   // increment and clear debounce counter
 trans_config.latch = true;              // interrupt is latched until its source is read
 trans_config.hpf_bypassed = false;      // HPF is not bypassed (default)
 trans_config.sleep_active = true;       // active in sleep mode
@@ -595,7 +595,7 @@ orient_config.bf_threshold = 1;          // 285° < z < 75° back->front,
                                          // 105° < z < 255° front->back 
 orient_config.z_lock = 4;                // z >= 29°
 orient_config.debounce_cnt = 5;          // 100 ms at ODR=50Hz in normal mode
-orient_config.debounce_cnt_mode = false; // increment and decrement debounce counter
+orient_config.debounce_cnt_clr = false;  // increment and decrement debounce counter
 
 mma845x_set_orientation_config (sensor, &orient_config);
 ...
@@ -1269,7 +1269,7 @@ void user_init(void)
         event_config.y_enabled = true;          // y-axis is used for event detection
         event_config.z_enabled = false;         // z-axis is not used for event detection
         event_config.debounce_cnt = 5;          // 100 ms at ODR=50Hz in normal oversampling mode
-        event_config.debounce_cnt_mode = false; // increment and decrement debounce counter
+        event_config.debounce_cnt_clr = false;  // increment and decrement debounce counter
         event_config.latch = true;              // interrupt is latched until its source is read
         event_config.sleep_active = true;       // active in sleep mode
         
@@ -1289,7 +1289,7 @@ void user_init(void)
         trans_config.y_enabled = true;          // y-axis is used for event detection
         trans_config.z_enabled = false;         // z-axis is not used for event detection
         trans_config.debounce_cnt = 2;          // 40 ms at ODR=50Hz in normal oversampling mode
-        trans_config.debounce_cnt_mode = true;  // increment and clear debounce counter
+        trans_config.debounce_cnt_clr = true;   // increment and clear debounce counter
         trans_config.latch = true;              // interrupt is latched until its source is read
         trans_config.hpf_bypassed = false;      // HPF is not bypassed (default)
         trans_config.sleep_active = true;       // active in sleep mode
@@ -1341,7 +1341,7 @@ void user_init(void)
                                                  // 105° < z < 255° front->back 
         orient_config.z_lock = 4;                // z >= 29°
         orient_config.debounce_cnt = 5;          // 100 ms at ODR=50Hz in normal mode
-        orient_config.debounce_cnt_mode = false; // increment and decrement debounce counter
+        orient_config.debounce_cnt_clr = false;  // increment and decrement debounce counter
 
         mma845x_set_orientation_config (sensor, &orient_config);
         mma845x_enable_int (sensor, mma845x_int_orientation, mma845x_int1_signal, true);

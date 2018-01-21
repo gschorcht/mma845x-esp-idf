@@ -260,8 +260,8 @@ typedef struct {
     bool    z_enabled;         // z higher than threshold enabled
 
     uint8_t debounce_cnt;      // debounce counter
-    bool    debounce_cnt_mode; // false - increment and decrement
-                               // true  - increment and clear
+    bool    debounce_cnt_clr;  // true  - increment and clear
+                               // false - increment and decrement
 
     bool    latch;             // latch the interrupt when true until the
                                // interrupt source has been read
@@ -308,8 +308,8 @@ typedef struct {
     uint8_t threshold;        // threshold used for all axes (0.063 g/count)
 
     uint8_t debounce_cnt;     // debounce counter
-    bool    debounce_cnt_mode;// false - increment and decrement
-                              // true  - increment and clear
+    bool    debounce_cnt_clr; // true  - increment and clear
+                              // false - increment and decrement
 
     bool    latch;            // latch the interrupt when true until the
                               // interrupt source has been read
@@ -424,8 +424,8 @@ typedef struct
     uint8_t z_lock;            // z-lock angle threshold
     
     uint8_t debounce_cnt;      // debounce counter
-    bool    debounce_cnt_mode; // false - increment and decrement
-                               // true  - increment and clear                          
+    bool    debounce_cnt_clr;  // true  - increment and clear
+                               // false - increment and decrement
 
     bool    sleep_active;      // false - function is bypassed in sleep mode    
                                // true  - function is active in sleep mode

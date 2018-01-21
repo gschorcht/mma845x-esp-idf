@@ -851,7 +851,7 @@ bool mma845x_set_int_event_config (mma845x_sensor_t* dev,
     ff_mt_cfg.OAE   = config->mode;
     ff_mt_cfg.ELE   = config->latch;
     ff_mt_ths.THS   = config->threshold;
-    ff_mt_ths.DBCNTM= config->debounce_cnt_mode;
+    ff_mt_ths.DBCNTM= config->debounce_cnt_clr;
 
     if (!mma845x_reg_write (dev, MMA845X_REG_FF_MT_CFG  , (uint8_t*)&ff_mt_cfg , 1) ||
         !mma845x_reg_write (dev, MMA845X_REG_FF_MT_THS  , (uint8_t*)&ff_mt_ths , 1) ||
@@ -901,7 +901,7 @@ bool mma845x_get_int_event_config (mma845x_sensor_t* dev,
     config->latch = ff_mt_cfg.ELE;
 
     config->threshold = ff_mt_ths.THS;
-    config->debounce_cnt_mode = ff_mt_ths.DBCNTM;
+    config->debounce_cnt_clr = ff_mt_ths.DBCNTM;
     
     config->sleep_active = ctrl3.WAKE_FF_MT;
 
@@ -953,7 +953,7 @@ bool mma845x_set_int_transient_config (mma845x_sensor_t* dev,
     transient_cfg.ELE     = config->latch;
     transient_cfg.HPF_BYP = config->hpf_bypassed;
     transient_ths.THS     = config->threshold;
-    transient_ths.DBCNTM  = config->debounce_cnt_mode;
+    transient_ths.DBCNTM  = config->debounce_cnt_clr;
 
     ctrl3.WAKE_TRANS = config->sleep_active;
     
@@ -1001,7 +1001,7 @@ bool mma845x_get_int_transient_config (mma845x_sensor_t* dev,
     config->z_enabled = transient_cfg.ZTEFE;
 
     config->threshold = transient_ths.THS;
-    config->debounce_cnt_mode = transient_ths.DBCNTM;
+    config->debounce_cnt_clr = transient_ths.DBCNTM;
 
     config->latch = transient_cfg.ELE;
     config->hpf_bypassed = transient_cfg.HPF_BYP;
@@ -1181,7 +1181,7 @@ bool mma845x_set_orientation_config (mma845x_sensor_t* dev,
     struct mma845x_reg_pl_bf_zcomp pl_zcomp;
 
     pl_cfg.PL_EN   = config->enabled;
-    pl_cfg.DBCNTM  = config->debounce_cnt_mode;
+    pl_cfg.DBCNTM  = config->debounce_cnt_clr;
     pl_ths.PL_THS  = config->pl_threshold;
     pl_ths.HYS     = config->pl_hysteresis;
     pl_zcomp.BKFR  = config->bf_threshold;
@@ -1237,7 +1237,7 @@ bool mma845x_get_orientation_config (mma845x_sensor_t* dev,
         return false;
     }
 
-    config->debounce_cnt_mode = pl_cfg.DBCNTM;
+    config->debounce_cnt_clr = pl_cfg.DBCNTM;
        
     config->enabled       = pl_cfg.PL_EN;
     config->pl_threshold  = pl_ths.PL_THS;
